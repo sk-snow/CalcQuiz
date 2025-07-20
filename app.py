@@ -3,16 +3,11 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import io  # 画像化用
 
-# ========= ここだけフォント設定 =========
-# Windows でも Cloud でも MS Gothic が無い環境を考慮して
-# なければデフォルトフォントにフォールバック
-try:
-    plt.rcParams["font.family"] = "MS Gothic"
-except:
-    pass
-# =======================================
+# ───────── フォント設定 ─────────
+font_path = "NotoSansJP-Regular.ttf"
+jp_font = fm.FontProperties(fname=font_path)
+plt.rcParams["font.family"] = jp_font.get_name()
 
 # ───────── 四則演算の問題を生成 ─────────
 def generate_problem(op, min_digits, max_digits):
@@ -39,8 +34,8 @@ def generate_problem(op, min_digits, max_digits):
 # ───────── UI ─────────
 st.title("四則演算トレーニングツール")
 
-with st.form("config"):
-    op  = st.selectbox("演算", ["+", "-", "×", "÷"])
+with st.form("config_form"):
+    op  = st.selectbox("演算を選択", ["+", "-", "×", "÷"])
     n   = st.number_input("出題数", 1, 100, 10, step=1, format="%d")
     d1  = st.number_input("最小桁", 1, 5, 1,  step=1, format="%d")
     d2  = st.number_input("最大桁", d1, 9, d1, step=1, format="%d")
@@ -87,13 +82,9 @@ if "prob" in st.session_state:
         fig, ax = plt.subplots()
         ax.bar("正解",     correct_ct,          color="green", label="正解")
         ax.bar("不正解",   len(res)-correct_ct, color="red",   label="不正解")
-        ax.set_title("正解・不正解の結果", fontname="MS Gothic")
-        ax.legend(prop={"family": "MS Gothic"})
-
-        buf = io.BytesIO()
-        plt.savefig(buf, format="png", bbox_inches="tight")
-        buf.seek(0)
-        st.image(buf)
+        ax.set_title("正解・不正解の結果", fontproperties=jp_font)
+        ax.legend(prop=jp_font)
+        st.pyplot(fig)
 
         # ───────── CSV ダウンロード ─────────
         st.download_button(
