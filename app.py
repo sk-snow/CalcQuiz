@@ -37,8 +37,8 @@ st.title("四則演算トレーニングツール")
 with st.form("config_form"):
     op  = st.selectbox("演算を選択", ["+", "-", "×", "÷"])
     n   = st.number_input("出題数", 1, 100, 10, step=1, format="%d")
-    d1  = st.number_input("最小桁", 1, 5, 1,  step=1, format="%d")
-    d2  = st.number_input("最大桁", d1, 9, d1, step=1, format="%d")
+    d1  = st.number_input("最小桁数", 1, 5, 1,  step=1, format="%d")
+    d2  = st.number_input("最大桁数", d1, 9, d1, step=1, format="%d")
     start = st.form_submit_button("スタート")
 
 # ───────── 問題生成 ─────────
