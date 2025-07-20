@@ -1,0 +1,3 @@
+開く用のコマンド:
+
+streamlit run app.py
