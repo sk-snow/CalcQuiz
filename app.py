@@ -83,8 +83,12 @@ if "prob" in st.session_state:
         ax.bar("正解",     correct_ct,          color="green", label="正解")
         ax.bar("不正解",   len(res)-correct_ct, color="red",   label="不正解")
         ax.set_title("正解・不正解の結果", fontproperties=jp_font)
-        ax.get_xticklabels(["正解", "不正解"], fontproperties=jp_font)
         ax.legend(prop=jp_font)
+
+        # 豆腐対策
+        for label in ax.get_xticklabels():
+            label.set_fontproperties(jp_font)
+
         st.pyplot(fig)
 
         # ───────── CSV ダウンロード ─────────
