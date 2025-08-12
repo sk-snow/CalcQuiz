@@ -3,6 +3,7 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import datetime  #時間管理用
 
 # ───────── フォント設定 ─────────
 font_path = "NotoSansJP-Regular.ttf"
@@ -43,13 +44,29 @@ with st.form("config_form"):
 
 # ───────── 問題生成 ─────────
 if start:
+    # --- 出題内容を初期化 ---
     st.session_state.prob = []
     st.session_state.ans  = []
     st.session_state.op   = op
+    st.session_state.start_time = datetime.datetime.now()
+
+    # --- 入力値の初期化もここで定義 ---
+    for i in range(1, n + 1):
+        st.session_state[f"in_{i}"] = 0  # ← 直接0をセット（これが本質）
+
+    # --- 問題と答えを生成 ---
     for _ in range(n):
         a, b, c = generate_problem(op, d1, d2)
         st.session_state.prob.append((a, b))
         st.session_state.ans.append(c)
+
+    # --- rerunフラグで次の描画に備える ---
+    st.session_state.rerun_flag = True
+
+# --- rerun 実行 ---
+if st.session_state.get("rerun_flag", False):
+    st.session_state.rerun_flag = False
+    st.rerun()
 
 # ───────── 回答欄 ─────────
 if "prob" in st.session_state:
@@ -57,7 +74,14 @@ if "prob" in st.session_state:
     inputs = []
     for i, (a, b) in enumerate(st.session_state.prob, 1):
         st.markdown(f"**{i}) {a} {st.session_state.op} {b} =**")
-        val = st.number_input("", key=f"in_{i}", step=1, format="%d")
+        val = st.number_input(
+            "",
+            key=f"in_{i}",
+            value=0,  # 初期値だけを設定
+            step=1,
+            format="%d"
+        )
+
         inputs.append(val)
 
     # ───────── 採点 ─────────
@@ -77,6 +101,12 @@ if "prob" in st.session_state:
         df = pd.DataFrame(res)
         st.dataframe(df)
         st.write(f"正解数: {correct_ct}/{len(res)}")
+
+        # ───────── 経過時間の表示 ─────────
+        if "start_time" in st.session_state:
+            elapsed = datetime.datetime.now() - st.session_state.start_time
+            h, m, s = str(elapsed).split(":")
+            st.write(f"所要時間: {int(float(h))}時間 {int(float(m))}分 {int(float(s))}秒")
 
         # ───────── グラフ（日本語→画像化で豆腐回避） ─────────
         fig, ax = plt.subplots()
